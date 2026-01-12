@@ -1,5 +1,8 @@
 local M = {}
 
+---Cached opencode server port.
+local cached_port = nil
+
 ---An `opencode` server process.
 ---@class opencode.cli.server.Server : opencode.cli.server.Process
 ---
@@ -247,6 +250,12 @@ function M.get_port(launch)
   launch = launch ~= false
 
   return require("opencode.promise").new(function(resolve, reject)
+    -- Use cached port if available (fast path)
+    if cached_port then
+      resolve(cached_port)
+      return
+    end
+
     local configured_port = require("opencode.config").opts.port
     local find_port_fn = function()
       if configured_port then
@@ -264,6 +273,7 @@ function M.get_port(launch)
 
     local initial_ok, initial_result = pcall(find_port_fn)
     if initial_ok then
+      cached_port = initial_result
       resolve(initial_result)
       return
     end
@@ -286,6 +296,11 @@ function M.get_port(launch)
       end
     end)
   end)
+end
+
+---Clear the cached port (useful for testing or manual restart).
+function M.clear_cached_port()
+  cached_port = nil
 end
 
 return M
