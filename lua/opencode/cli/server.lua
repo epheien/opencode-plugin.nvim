@@ -48,7 +48,7 @@ local function get_processes_unix()
 
   local processes = {}
   for pid_str in pgrep_output:gmatch("[^\r\n]+") do
-    local pid = tonumber(vim.split(pid_str, '%s+')[1])
+    local pid = tonumber(vim.split(pid_str, "%s+")[1])
     if pid then
       local lsof_output = exec("lsof -w -iTCP -sTCP:LISTEN -P -n -a -p " .. pid .. " 2>/dev/null || true")
 
