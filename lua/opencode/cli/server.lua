@@ -190,9 +190,11 @@ local function find_server_inside_nvim_cwd()
 
     -- CWDs match exactly, or `opencode`'s CWD is under neovim's CWD.
     if normalized_server_cwd:find(normalized_nvim_cwd, 1, true) == 1 then
-      found_server = server
-      -- On Unix, prioritize embedded
-      if not is_windows() and is_descendant_of_neovim(server.pid) then
+      if is_windows() then
+        found_server = server
+      elseif is_descendant_of_neovim(server.pid) then
+        -- On Unix, only select embedded
+        found_server = server
         break
       end
     end
