@@ -183,11 +183,17 @@ function M.select(opts)
             table.insert(formatted, 2, { string.rep(" ", 18 - #item.name) })
             return formatted
           else
+            local indent = #tostring(#items) - #tostring(item.idx)
             if item.__group then
               local divider = string.rep("—", (80 - #item.name) / 2)
-              return divider .. item.name .. divider
+              return string.rep(" ", indent) .. divider .. item.name .. divider
             end
-            return ("[%s]%s%s"):format(item.name, string.rep(" ", 18 - #item.name), item.text or "")
+            return ("%s[%s]%s%s"):format(
+              string.rep(" ", indent),
+              item.name,
+              string.rep(" ", 18 - #item.name),
+              item.text or ""
+            )
           end
         end,
       }
