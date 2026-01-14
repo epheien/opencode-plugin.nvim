@@ -16,13 +16,13 @@
 ---@field new? fun(opts: table): opencode.Provider
 ---
 ---Toggle `opencode`.
----@field toggle? fun(self: opencode.Provider)
+---@field toggle? fun(self: opencode.Provider, callback?: fun())
 ---
 ---Start `opencode`.
 ---Called when attempting to interact with `opencode` but none was found.
 ---`opencode.nvim` then polls for a couple seconds waiting for one to appear.
 ---Should not steal focus by default, if possible.
----@field start? fun(self: opencode.Provider)
+---@field start? fun(self: opencode.Provider, callback?: fun())
 ---
 ---Stop the previously started `opencode`.
 ---Called when Neovim is exiting.
@@ -69,7 +69,9 @@ end
 function M.toggle()
   local provider = require("opencode.config").provider
   if provider and provider.toggle then
-    provider:toggle()
+    provider:toggle(function()
+      require("opencode.events").subscribe()
+    end)
   else
     error("`provider.toggle` unavailable — run `:checkhealth opencode` for details", 0)
   end
@@ -79,7 +81,9 @@ end
 function M.start()
   local provider = require("opencode.config").provider
   if provider and provider.start then
-    provider:start()
+    provider:start(function()
+      require("opencode.events").subscribe()
+    end)
   else
     error("`provider.start` unavailable — run `:checkhealth opencode` for details", 0)
   end

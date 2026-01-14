@@ -24,9 +24,9 @@ function Terminal.health()
 end
 
 ---Start if not running, else hide/show the window.
-function Terminal:toggle()
+function Terminal:toggle(callback)
   if self.bufnr == nil then
-    self:start()
+    self:start(callback)
   else
     if self.winid ~= nil and vim.api.nvim_win_is_valid(self.winid) then
       -- Hide the window
@@ -42,7 +42,7 @@ function Terminal:toggle()
 end
 
 ---Open a window with a terminal buffer.
-function Terminal:start()
+function Terminal:start(callback)
   if self.bufnr == nil then
     local previous_win = vim.api.nvim_get_current_win()
 
@@ -58,6 +58,9 @@ function Terminal:start()
           vim.api.nvim_del_autocmd(auid)
           vim.api.nvim_set_current_win(self.winid)
           vim.cmd([[startinsert | call feedkeys("\<C-\>\<C-n>\<C-w>p", "n")]])
+          if callback then
+            callback()
+          end
         end
       end,
     })
