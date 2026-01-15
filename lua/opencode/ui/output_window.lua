@@ -21,7 +21,7 @@ function M.set_extmarks(buf, extmarks, line_offset)
       end
       local start_col = actual_mark.start_col
       if actual_mark.start_col then
-        actual_mark.start_col = nil
+        actual_mark.start_col = nil ---@diagnostic disable-line: inject-field
       end
       ---@cast actual_mark vim.api.keyset.set_extmark
       pcall(vim.api.nvim_buf_set_extmark, buf, M.namespace, target_line, start_col or 0, actual_mark)
