@@ -89,7 +89,8 @@ vim.api.nvim_create_autocmd("User", {
       end
       on_user_idle(idle_delay_ms, function()
         is_permission_request_open = true
-        if opts.confirm.enabled and event.properties.permission == "edit" then
+        local tbl = { "edit", "bash" }
+        if opts.confirm.enabled and vim.tbl_contains(tbl, event.properties.permission) then
           return require("opencode.ui.confirm").confirm(event, function(choice)
             is_permission_request_open = false
             if choice then

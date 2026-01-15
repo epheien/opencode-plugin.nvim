@@ -35,13 +35,25 @@ end
 ---@param event table
 ---@param on_choice? fun(choice?: string)
 function M.confirm(event, on_choice)
-  local title = "Permit opencode to: "
-    .. event.properties.permission
-    .. " "
-    .. table.concat(event.properties.patterns, ", ")
-    .. "?"
-  local content = event.properties.metadata.diff
-  local file_type = util.get_markdown_filetype(event.properties.metadata.filepath or event.properties.patterns[1])
+  local title, content, file_type
+  if event.properties.permission == "bash" then
+    title = "Permit opencode to: bash?"
+    if event.properties.metadata.command then
+      -- Need to modify opencode to support
+      content = event.properties.metadata.command
+    else
+      content = table.concat(event.properties.patterns, ", ")
+    end
+    file_type = "sh"
+  else
+    title = "Permit opencode to: "
+      .. event.properties.permission
+      .. " "
+      .. table.concat(event.properties.patterns, ", ")
+      .. "?"
+    content = event.properties.metadata.diff
+    file_type = util.get_markdown_filetype(event.properties.metadata.filepath or event.properties.patterns[1])
+  end
   M._confirm(title, content, file_type, on_choice)
 end
 
