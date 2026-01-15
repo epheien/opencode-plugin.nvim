@@ -53,17 +53,25 @@ function M.confirm(event, on_choice)
       .. "?"
     content = event.properties.metadata.diff
     file_type = util.get_markdown_filetype(event.properties.metadata.filepath or event.properties.patterns[1])
+    content = format_diff_content(content, file_type)
   end
   M._confirm(title, content, file_type, on_choice)
 end
 
 ---@param title string
----@param content string
+---@param content string|Output
 ---@param file_type string
 ---@param on_choice? fun(choice?: string)
 function M._confirm(title, content, file_type, on_choice)
   -- Format the diff content with syntax highlighting
-  local output = format_diff_content(content, file_type)
+
+  local output = content
+  if type(content) == "string" then
+    output = Output.new()
+    output:add_line("`````" .. file_type)
+    output:add_lines(vim.split(content, "\n", { plain = true }))
+    output:add_line("`````")
+  end
 
   local win_config = require("opencode.config").opts.events.permissions.confirm.window.config
   if type(win_config) == "function" then
@@ -107,7 +115,7 @@ function M._confirm(title, content, file_type, on_choice)
     }, win_config)
   )
 
-  -- Render formatted data with syntax highlighting
+  ---@cast output Output
   render_to_buffer(bufid, output)
 
   vim.bo.modifiable = false
