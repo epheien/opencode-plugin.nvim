@@ -51,11 +51,13 @@ vim.api.nvim_create_autocmd("User", {
 
     if event.type == "permission.asked" then
       local idle_delay_ms = opts.idle_delay_ms
-      vim.notify(
-        "`opencode` requested permission — awaiting idle…",
-        vim.log.levels.INFO,
-        { title = "opencode", timeout = idle_delay_ms }
-      )
+      if idle_delay_ms > 0 then
+        vim.notify(
+          "`opencode` requested permission — awaiting idle…",
+          vim.log.levels.INFO,
+          { title = "opencode", timeout = idle_delay_ms }
+        )
+      end
       on_user_idle(idle_delay_ms, function()
         is_permission_request_open = true
         vim.ui.select({ "Once", "Always", "Reject" }, {
