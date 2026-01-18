@@ -47,6 +47,13 @@ function Terminal:toggle(callback)
       local previous_win = vim.api.nvim_get_current_win()
       self.winid = vim.api.nvim_open_win(self.bufnr, true, resolve_win_config(self.opts))
       vim.api.nvim_set_current_win(previous_win)
+      vim.api.nvim_exec_autocmds("User", {
+        pattern = "OpencodeWinNew",
+        data = {
+          bufnr = self.bufnr,
+          winid = self.winid,
+        },
+      })
     end
   end
 end
@@ -84,6 +91,13 @@ function Terminal:start(callback)
     })
 
     vim.api.nvim_set_current_win(previous_win)
+    vim.api.nvim_exec_autocmds("User", {
+      pattern = "OpencodeWinNew",
+      data = {
+        bufnr = self.bufnr,
+        winid = self.winid,
+      },
+    })
   end
 end
 
