@@ -11,6 +11,16 @@ Terminal.name = "terminal"
 
 ---@class opencode.provider.terminal.Opts : vim.api.keyset.win_config
 
+---@param config opencode.provider.terminal.Opts
+---@return opencode.provider.terminal.Opts
+local function resolve_win_config(config)
+  local resolve = vim.deepcopy(config)
+  if type(config.width) == "function" then
+    resolve.width = config.width()
+  end
+  return resolve
+end
+
 function Terminal.new(opts)
   local self = setmetatable({}, Terminal)
   self.opts = opts or {}
@@ -35,7 +45,7 @@ function Terminal:toggle(callback)
     elseif self.bufnr ~= nil and vim.api.nvim_buf_is_valid(self.bufnr) then
       -- Show the window
       local previous_win = vim.api.nvim_get_current_win()
-      self.winid = vim.api.nvim_open_win(self.bufnr, true, self.opts)
+      self.winid = vim.api.nvim_open_win(self.bufnr, true, resolve_win_config(self.opts))
       vim.api.nvim_set_current_win(previous_win)
     end
   end
@@ -47,7 +57,7 @@ function Terminal:start(callback)
     local previous_win = vim.api.nvim_get_current_win()
 
     self.bufnr = vim.api.nvim_create_buf(true, false)
-    self.winid = vim.api.nvim_open_win(self.bufnr, true, self.opts)
+    self.winid = vim.api.nvim_open_win(self.bufnr, true, resolve_win_config(self.opts))
 
     local auid
     auid = vim.api.nvim_create_autocmd("TermRequest", {
